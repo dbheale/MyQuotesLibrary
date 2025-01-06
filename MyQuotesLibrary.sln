@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "frontend", "frontend", "{522F7DEB-E8BD-4D89-A1E4-2EDE0EA3529F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyQuotesLibrary.Client", "frontend\MyQuotesLibrary.Client\MyQuotesLibrary.Client.csproj", "{4CF24EAF-45EB-49B5-B17E-2C127FE938B2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4CF24EAF-45EB-49B5-B17E-2C127FE938B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CF24EAF-45EB-49B5-B17E-2C127FE938B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CF24EAF-45EB-49B5-B17E-2C127FE938B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CF24EAF-45EB-49B5-B17E-2C127FE938B2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4CF24EAF-45EB-49B5-B17E-2C127FE938B2} = {522F7DEB-E8BD-4D89-A1E4-2EDE0EA3529F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1FCE95EB-D0B1-4E2C-BE6C-5D8AEAF8279C}
+	EndGlobalSection
+EndGlobal

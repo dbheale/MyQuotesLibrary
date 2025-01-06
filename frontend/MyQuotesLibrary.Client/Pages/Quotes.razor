@@ -1,0 +1,41 @@
+@page "/quotes"
+@inject ISqliteWasmDbContextFactory<MyQuotesDbContext> DbContextFactory
+
+<h3>Quotes</h3>
+
+@if (quotes == null)
+{
+    <p>Loading...</p>
+}
+else if (!quotes.Any())
+{
+    <p>No quotes found.</p>
+}
+else
+{
+    <ul>
+        @foreach (var quote in quotes)
+        {
+            <li>
+                <strong>@quote.Author</strong>: @quote.Text
+            </li>
+        }
+    </ul>
+}
+
+<NavLink href="/" class="btn btn-primary">
+    Add Quote
+</NavLink>
+
+
+@code {
+    private List<Quote>? quotes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var DbContext = await DbContextFactory.CreateDbContextAsync())
+        {
+            quotes = await DbContext.Quotes.ToListAsync();
+        }
+    }
+}

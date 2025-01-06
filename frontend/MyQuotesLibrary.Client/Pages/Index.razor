@@ -1,0 +1,44 @@
+﻿@page "/"
+@inject ISqliteWasmDbContextFactory<MyQuotesDbContext> DbContextFactory
+@inject ILogger<Index> Logger
+
+<h3>Add a Quote</h3>
+
+<EditForm Model="Model" FormName="AddQuote" OnSubmit="SaveQuote">
+    <div>
+        <label>
+            Quote:
+            <InputText @bind-Value="Model.Text" placeholder="Quote" />
+        </label>
+        <label>
+            Author:
+            <InputText @bind-Value="Model.Author" placeholder="Author" />
+        </label>
+    </div>
+    <div>
+        <button type="submit">Save</button>
+    </div>
+</EditForm>
+
+<NavLink href="/quotes" class="btn btn-primary">
+    View Quotes
+</NavLink>
+
+
+@code {
+    [SupplyParameterFromForm]
+    private Quote? Model { get; set; } = new();
+
+    private async Task SaveQuote()
+    {
+        if (Model == null) throw new ArgumentException("How did that happen?");
+        using (var DbContext = await DbContextFactory.CreateDbContextAsync())
+        {
+            Model.CreatedAt = DateTime.UtcNow;
+            DbContext.Quotes.Add(Model);
+            await DbContext.SaveChangesAsync();
+        }
+        Logger.LogDebug("Result: {@model}", Model);
+        Model = new();
+    }
+}
