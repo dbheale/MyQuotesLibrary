@@ -83,12 +83,7 @@ export async function getDataFromIndexedDb(file) {
     if (blob && blob instanceof Blob) {
         const arrayBuffer = await blob.arrayBuffer();
         console.log(`Restored Blob as ArrayBuffer. Length: ${arrayBuffer.byteLength}`);
-        const uint8Array = new Uint8Array(arrayBuffer);
-        let binary = '';
-        for (let i = 0; i < uint8Array.byteLength; i++) {
-            binary += String.fromCharCode(uint8Array[i]);
-        }
-        return btoa(binary);  // Convert to Base64
+        return new Uint8Array(arrayBuffer);
     }
     return null;
 }

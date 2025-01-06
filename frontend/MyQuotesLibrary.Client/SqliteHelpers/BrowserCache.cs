@@ -38,13 +38,14 @@ namespace MyQuotesLibrary.Client.SqliteHelpers
         {
             var module = await moduleTask.Value;
             
-            var base64String = await module.InvokeAsync<string>("getDataFromIndexedDb", filename);
+            var bytes = await module.InvokeAsync<byte[]?>("getDataFromIndexedDb", filename);
 
-            if (!string.IsNullOrEmpty(base64String))
+            if (bytes != null)
             {
-                return Convert.FromBase64String(base64String);
+                return bytes;
             }
-            return Array.Empty<byte>();
+
+            return [];
         }
 
         public async Task<int> SaveDataToIndexedDb(string filename, byte[] data)
