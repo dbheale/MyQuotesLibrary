@@ -1,0 +1,84 @@
+﻿<div class="relative">
+
+    <input @bind-Value="SearchText"
+           @bind-Value:event="oninput"
+           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+           placeholder="Search tags..." />
+
+    @if (FilteredTags.Any())
+    {
+        <ul class="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 max-h-40 overflow-y-auto">
+            @foreach (var tag in FilteredTags)
+            {
+                <li class="px-4 py-2 hover:bg-gray-200 cursor-pointer" @onclick="() => SelectTagAsync(tag)">
+                    @tag
+                </li>
+            }
+        </ul>
+    }
+
+    @if (!FilteredTags.Any() && !string.IsNullOrWhiteSpace(SearchText))
+    {
+        <div class="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 p-2">
+            <span class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                  @onclick="AddTagAsync">
+                Add "@SearchText"
+            </span>
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<Tag> OnTagSelected { get; set; }
+    private string _searchText = string.Empty;
+    private string SearchText
+    {
+        get => _searchText; set
+        {
+            _searchText = value;
+            OnInputChanged();
+        }
+    }
+    private List<string> FilteredTags { get; set; } = [];
+    private IEnumerable<Tag> Tags { get; set; } = [];
+
+    [Inject]
+    private TagService TagService { get; set; } = default!;
+
+    private async Task ReloadTagsAsync()
+    {
+        Tags = await TagService.GetAllAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadTagsAsync();
+    }
+
+    private Task SelectTagAsync(string tag)
+    {
+        SearchText = string.Empty;
+        FilteredTags.Clear();
+        StateHasChanged();
+        return OnTagSelected.InvokeAsync(Tags.First(f => f.Text == tag));
+    }
+
+    private void OnInputChanged()
+    {
+        FilteredTags = Tags
+            .Where(t => SearchText != string.Empty && t.Text.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+            .Select(s => s.Text)
+            .ToList();
+
+        StateHasChanged();
+    }
+
+    private async Task AddTagAsync()
+    {
+        await TagService.Add(SearchText);
+        await SelectTagAsync(SearchText);
+        await ReloadTagsAsync();
+    }
+}

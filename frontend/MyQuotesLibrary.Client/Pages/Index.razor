@@ -1,44 +1,295 @@
 ﻿@page "/"
-@inject ISqliteWasmDbContextFactory<MyQuotesDbContext> DbContextFactory
+@implements IDisposable
 @inject ILogger<Index> Logger
+@inject QuoteService quoteService
+@inject CategoryService categoryService
+@inject TagService tagService
+@inject ISqliteWasmDbContextFactory<MyQuotesDbContext> DbContextFactory
 
-<h3>Add a Quote</h3>
-
-<EditForm Model="Model" FormName="AddQuote" OnSubmit="SaveQuote">
-    <div>
-        <label>
-            Quote:
-            <InputText @bind-Value="Model.Text" placeholder="Quote" />
-        </label>
-        <label>
-            Author:
-            <InputText @bind-Value="Model.Author" placeholder="Author" />
-        </label>
+<div class="container mx-auto p-4">
+    <div class="mb-4 border-b border-gray-200">
+        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center">
+            <li class="mr-2">
+                <button class="inline-block p-4 @(activeTab == "add" ? "text-blue-600 border-b-2 border-blue-600" : "hover:text-gray-600 hover:border-gray-300")"
+                        @onclick="@(() => activeTab = "add")">
+                    <i class="fas fa-plus-circle mr-2"></i>Add Quote
+                </button>
+            </li>
+            <li class="mr-2">
+                <button class="inline-block p-4 @(activeTab == "library" ? "text-blue-600 border-b-2 border-blue-600" : "hover:text-gray-600 hover:border-gray-300")"
+                        @onclick="@(() => activeTab = "library")">
+                    <i class="fas fa-book mr-2"></i>Library
+                </button>
+            </li>
+            <li class="mr-2">
+                <button class="inline-block p-4 @(activeTab == "settings" ? "text-blue-600 border-b-2 border-blue-600" : "hover:text-gray-600 hover:border-gray-300")"
+                        @onclick="@(() => activeTab = "settings")">
+                    <i class="fas fa-cog mr-2"></i>Settings
+                </button>
+            </li>
+        </ul>
     </div>
-    <div>
-        <button type="submit">Save</button>
+
+    <div class="mt-4">
+        @if (activeTab == "add")
+        {
+            <div class="max-w-2xl mx-auto">
+                <EditForm Model="@newQuote" OnValidSubmit="@HandleQuoteSubmit">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Quote</label>
+                        <InputTextArea @bind-Value="newQuote.Text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="4" />
+                        <ValidationMessage For="@(() => newQuote.Text)" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Author</label>
+                        <InputText @bind-Value="newQuote.Author" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                        <ValidationMessage For="@(() => newQuote.Author)" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Tags</label>
+                        <TagSelector OnTagSelected="HandleAddTag" />    <div class="flex flex-wrap gap-2">
+                            @if (newQuote.Tags != null)
+                            {
+                                @foreach (var tag in newQuote.Tags)
+                                {
+                                    <div class="flex space-x-2 items-center bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                                        <span>@tag.Text</span>
+                                        <span @onclick="() => HandleRemoveTag(tag.Id)" class="ml-2 cursor-pointer">
+                                            <i class="fas fa-cancel text-red-500 hover:text-red-700 text-xs"></i>
+                                        </span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Categories</label>
+                        <CategorySelector OnCategorySelected="HandleAddCategory" />
+                        <div class="flex flex-wrap gap-2">
+                            @if (newQuote.Categories != null)
+                            {
+                                @foreach (var category in newQuote.Categories)
+                                {
+                                    <div class="flex space-x-2 items-center bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+                                        <span>@category.Name</span>
+                                        <span type="button" @onclick="() => HandleRemoveCategory(category.Id)" class="ml-2 cursor-pointer focus:outline-none">
+                                            <i class="fas fa-cancel text-red-500 hover:text-red-700 text-xs"></i>
+                                        </span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        <i class="fas fa-save mr-2"></i>Save Quote
+                    </button>
+                </EditForm>
+            </div>
+        }
+        else if (activeTab == "library")
+        {
+            <div class="mb-4 flex gap-4">
+                <InputSelect @bind-Value="selectedCategoryFilter" class="shadow border rounded py-2 px-3 text-gray-700">
+                    <option value="-1">All Categories</option>
+                    @foreach (var category in Categories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </InputSelect>
+                <InputSelect @bind-Value="tagFilter" class="shadow border rounded py-2 px-3 text-gray-700">
+                    <option value="-1">All Tags</option>
+                    @foreach (var tag in Tags)
+                    {
+                        <option value="@tag.Id">@tag.Text</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <QuickGrid Items="@FilteredQuotes" width="100%">
+                <PropertyColumn Property="@(q => q.Text)" Title="Quote" />
+                <PropertyColumn Property="@(q => q.Author)" Title="Author" />
+                <TemplateColumn Title="Categories">
+                    <div class="flex items-center">
+                        @if (context.Categories != null)
+                        {
+                            foreach (var category in context.Categories)
+                            {
+                                <div class="flex space-x-2 items-center bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+                                    <span>@category.Name</span>
+                                    @if (editing)
+                                    {
+                                        <span type="button" @onclick="() => RemoveCategory(context, category)" class="ml-2 cursor-pointer focus:outline-none">
+                                            <i class="fas fa-cancel text-red-500 hover:text-red-700 text-xs"></i>
+                                        </span>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </TemplateColumn>
+                <TemplateColumn Title="Tags">
+                    <div class="flex items-center">
+                        @if (context.Tags != null)
+                        {
+                            @foreach (var tag in context.Tags)
+                            {
+                                <div class="flex space-x-2 items-center bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                                    <span>@tag.Text</span>
+                                    @if (editing)
+                                    {
+                                        <span @onclick="() => RemoveTag(context, tag)" class="ml-2 cursor-pointer">
+                                            <i class="fas fa-cancel text-red-500 hover:text-red-700 text-xs"></i>
+                                        </span>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </TemplateColumn>
+            </QuickGrid>
+        }
+        else if (activeTab == "settings")
+        {
+            <div class="max-w-2xl mx-auto">
+                @*  <div class="mb-4">
+            <EditForm Model="@newCategory" OnValidSubmit="@HandleCategorySubmit">
+            <DataAnnotationsValidator />
+            <div class="flex gap-2">
+            <div class="flex-1">
+            <InputText @bind-Value="newCategory.Name" placeholder="New category name"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+            <ValidationMessage For="@(() => newCategory.Name)" />
+            </div>
+            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            <i class="fas fa-plus mr-2"></i>Add
+            </button>
+            </div>
+            </EditForm>
+            </div> *@
+
+                <div class="space-y-2">
+                    @foreach (var category in Categories)
+                    {
+                        <div class="flex items-center justify-between p-3 bg-white rounded shadow">
+                            <span>@category.Name</span>
+                            <div class="space-x-2">
+                                <span @onclick="() => categoryService.DeleteAsync(category.Id)"
+                                        class="cursor-pointer text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
     </div>
-</EditForm>
-
-<NavLink href="/quotes" class="btn btn-primary">
-    View Quotes
-</NavLink>
-
+</div>
 
 @code {
-    [SupplyParameterFromForm]
-    private Quote? Model { get; set; } = new();
+    private string activeTab = "add";
+    private Quote newQuote = new();
+    private Category newCategory = new();
+    private int selectedCategoryFilter = -1;
+    private int tagFilter = -1;
+    private MyQuotesDbContext? dbContext;
+    private bool editing = false;
 
-    private async Task SaveQuote()
+    private IEnumerable<Category> Categories { get; set; } = [];
+    private IEnumerable<Tag> Tags { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
     {
-        if (Model == null) throw new ArgumentException("How did that happen?");
-        using (var DbContext = await DbContextFactory.CreateDbContextAsync())
+        dbContext = await DbContextFactory.CreateDbContextAsync();
+        await RefreshCategories();
+        await RefreshTags();
+    }
+
+    private async Task RefreshTags()
+    {
+        Tags = await tagService.GetAllAsync();
+    }
+
+    private async Task RefreshCategories()
+    {
+        Categories = await categoryService.GetAllAsync();
+    }
+
+    private IQueryable<Quote> FilteredQuotes
+    {
+        get
         {
-            Model.CreatedAt = DateTime.UtcNow;
-            DbContext.Quotes.Add(Model);
-            await DbContext.SaveChangesAsync();
+            if (dbContext == null) return Array.Empty<Quote>().AsQueryable();
+
+            var quotes = dbContext.Quotes
+                .Include(i => i.Categories)
+                .Include(i => i.Tags)
+                .AsQueryable();
+
+            if (selectedCategoryFilter > 0)
+            {
+                quotes = quotes.Where(q => q.Categories!.Any(a => a.Id == selectedCategoryFilter));
+            }
+
+            if (tagFilter > 0)
+            {
+                quotes = quotes.Where(q => q.Tags!.Any(a => a.Id == tagFilter));
+            }
+
+            return quotes;
         }
-        Logger.LogDebug("Result: {@model}", Model);
-        Model = new();
+    }
+
+    private async Task HandleQuoteSubmit()
+    {
+        await quoteService.AddAsync(newQuote);
+        newQuote = new();
+    }
+
+    private void HandleAddTag(Tag tag)
+    {
+        newQuote.Tags ??= [];
+        newQuote.Tags.Add(tag);
+    }
+
+    private void HandleRemoveTag(int tagId)
+    {
+        newQuote.Tags ??= [];
+        newQuote.Tags.Remove(newQuote.Tags.First(f => f.Id == tagId));
+    }
+
+    private void HandleAddCategory(Category category)
+    {
+        newQuote.Categories ??= [];
+        newQuote.Categories.Add(category);
+    }
+
+    private void HandleRemoveCategory(int categoryId)
+    {
+        newQuote.Categories ??= [];
+        newQuote.Categories.Remove(newQuote.Categories.First(f => f.Id == categoryId));
+    }
+
+    private async Task RemoveCategory(Quote quote, Category category)
+    {
+        quote.Categories?.Remove(category);
+        await dbContext!.SaveChangesAsync();
+    }
+
+    private async Task RemoveTag(Quote quote, Tag tag)
+    {
+        quote.Tags?.Remove(tag);
+        await dbContext!.SaveChangesAsync();
+    }
+
+    public void Dispose()
+    {
+        dbContext?.Dispose();
     }
 }
