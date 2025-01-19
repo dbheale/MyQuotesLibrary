@@ -5,7 +5,9 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseRazorSourceGenerator>false</UseRazorSourceGenerator>
-		<WasmNativeBuild>true</WasmNativeBuild>
+		<WasmStripILAfterAOT>false</WasmStripILAfterAOT>
+		<WasmEmitSymbolMap>true</WasmEmitSymbolMap>
+		<WasmNativeStrip>false</WasmNativeStrip>
 		<PublishTrimmed>true</PublishTrimmed>
 	</PropertyGroup>
 

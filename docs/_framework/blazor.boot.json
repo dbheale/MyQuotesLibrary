@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "MyQuotesLibrary.Client",
   "resources": {
-    "hash": "sha256-p4fp9x07frEYe96nIsmCZhZ4kJ/HUhYmpki6jEqFloo=",
+    "hash": "sha256-8GrQyn2LZDhqeRpjkcXE0SKetS3FsjWTEKO1LHCQRV8=",
     "fingerprinting": {
       "Microsoft.AspNetCore.Components.Forms.inhp4ncg0e.wasm": "Microsoft.AspNetCore.Components.Forms.wasm",
       "Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter.bzkaedxa4b.wasm": "Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter.wasm",
@@ -28,7 +28,7 @@
       "Microsoft.Extensions.Primitives.8omryeirak.wasm": "Microsoft.Extensions.Primitives.wasm",
       "Microsoft.JSInterop.3afqt8so3k.wasm": "Microsoft.JSInterop.wasm",
       "Microsoft.JSInterop.WebAssembly.heoad7mujs.wasm": "Microsoft.JSInterop.WebAssembly.wasm",
-      "MyQuotesLibrary.Client.v3yyrhrglt.wasm": "MyQuotesLibrary.Client.wasm",
+      "MyQuotesLibrary.Client.jcfzklqzbp.wasm": "MyQuotesLibrary.Client.wasm",
       "netstandard.2yc45ufakd.wasm": "netstandard.wasm",
       "SQLitePCLRaw.batteries_v2.s7afp8t1el.wasm": "SQLitePCLRaw.batteries_v2.wasm",
       "SQLitePCLRaw.core.6zzg66edsq.wasm": "SQLitePCLRaw.core.wasm",
@@ -76,8 +76,8 @@
       "System.Threading.08b4gdlk70.wasm": "System.Threading.wasm",
       "System.Transactions.Local.bxrfl7ri6w.wasm": "System.Transactions.Local.wasm",
       "System.6bp5k9v1ih.wasm": "System.wasm",
-      "dotnet.native.bg8b6jfkbe.js": "dotnet.native.js",
-      "dotnet.native.4buwjjnkxz.wasm": "dotnet.native.wasm",
+      "dotnet.native.50doiel82x.js": "dotnet.native.js",
+      "dotnet.native.fte1khvi2b.wasm": "dotnet.native.wasm",
       "dotnet.js": "dotnet.js",
       "dotnet.runtime.o8gq1i8bk6.js": "dotnet.runtime.js",
       "icudt_CJK.tjcz0u77k5.dat": "icudt_CJK.dat",
@@ -85,13 +85,13 @@
       "icudt_no_CJK.lfu7j35m59.dat": "icudt_no_CJK.dat"
     },
     "jsModuleNative": {
-      "dotnet.native.bg8b6jfkbe.js": "sha256-i+E95LhGUPJmmb41RpE5seg8FUMBFhUcDEeJCslFUVE="
+      "dotnet.native.50doiel82x.js": "sha256-Kw4YkkbQmiaIYPAdpMq2x7oNkRWVLoYkNizcfTBMF44="
     },
     "jsModuleRuntime": {
       "dotnet.runtime.o8gq1i8bk6.js": "sha256-uD1t4tsPtmIHsx30SC4OztehGGaHVDksFD38rL2e3P4="
     },
     "wasmNative": {
-      "dotnet.native.4buwjjnkxz.wasm": "sha256-kA/D+RVg1M3G6mDRns6RXhNTyCQm/YoeD0qSWIMetTY="
+      "dotnet.native.fte1khvi2b.wasm": "sha256-Q+lXe0iDNlMdqWVaI3IWEKSeoKJwfRX9xqYX2zSD0KM="
     },
     "icu": {
       "icudt_CJK.tjcz0u77k5.dat": "sha256-SZLtQnRc0JkwqHab0VUVP7T3uBPSeYzxzDnpxPpUnHk=",
@@ -128,7 +128,7 @@
       "Microsoft.Extensions.Primitives.8omryeirak.wasm": "sha256-iOXJ6xMILdIdSWDD2fNHtnrXI0YtuWx4chp/bwgCVgc=",
       "Microsoft.JSInterop.3afqt8so3k.wasm": "sha256-2+ztdPWvZucphCR0wmJIb0Lkd7/8Cb7F9xu546fvrAE=",
       "Microsoft.JSInterop.WebAssembly.heoad7mujs.wasm": "sha256-99wG3VH14sWkwPaF5rX6YAcJvtAhDuqonwihvj2m5HA=",
-      "MyQuotesLibrary.Client.v3yyrhrglt.wasm": "sha256-K3Clu8ZrY3YEUymndQiO9ZZs9aRRYeU0uAGJji1rDhQ=",
+      "MyQuotesLibrary.Client.jcfzklqzbp.wasm": "sha256-jV+NNfkWsDWNKeBBJiEyrl0DBnOGvm+TOE8QtSFDwRE=",
       "netstandard.2yc45ufakd.wasm": "sha256-dhglqMqFNhDkj9BCFcsjk+/i1VjT7cQF3h1vEraZE20=",
       "SQLitePCLRaw.batteries_v2.s7afp8t1el.wasm": "sha256-iDWqfNC2ti/pSJCuvUowQ2MfXRZtPTTTVpGjY0CDlw0=",
       "SQLitePCLRaw.core.6zzg66edsq.wasm": "sha256-IthlNARMAQoEF4xj7MI9qKoGYcbdgTgkuCiXQq4w8Us=",
